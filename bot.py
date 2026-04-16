@@ -9,8 +9,11 @@ from aiogram.client.default import DefaultBotProperties
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# Твой токен
+# Твой токен (уже вставлен)
 TOKEN = "8629438921:AAG3d3oeRgRaZtzTotRWr7srd4AlI5CMdsg"
+
+# Порт для веб-сервера (прописан жестко)
+PORT = 10000
 
 # Создаём бота и диспетчер
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
@@ -34,9 +37,9 @@ async def run_web_server():
     app.router.add_get("/", handle_health)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 10000)  # порт 10000 (Render его ожидает)
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
     await site.start()
-    logging.info("Веб-сервер запущен на порту 10000")
+    logging.info(f"Веб-сервер запущен на порту {PORT}")
 
 # ===== Главная функция =====
 async def main():
