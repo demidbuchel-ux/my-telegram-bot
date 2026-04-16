@@ -1,30 +1,31 @@
+import os
+import asyncio
 import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import CommandStart
 
-# Твой токен (уже вставлен)
-TOKEN = "8629438921:AAG3d3oeRgRaZtzTotRWr7srd4AlI5CMdsg"
+# Настройка логов
+logging.basicConfig(level=logging.INFO)
 
-# Настройка логов, чтобы видеть, что происходит
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+# Получаем токен из переменной окружения Render
+TOKEN = os.environ.get("BOT_TOKEN")
+if not TOKEN:
+    raise ValueError("Токен не найден! Укажите BOT_TOKEN в переменных окружения.")
 
-async def start(update: Update, context):
-    await update.message.reply_text("Привет! Я бот Демида. Я работаю на Amvera!")
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-async def echo(update: Update, context):
-    await update.message.reply_text(f"Ты написал: {update.message.text}")
+@dp.message(CommandStart())
+async def start_handler(message: types.Message):
+    await message.answer("Привет! Я бот Демида и я работаю на Render!")
 
-def main():
-    # Создаем приложение
-    app = Application.builder().token(TOKEN).build()
+@dp.message()
+async def echo_handler(message: types.Message):
+    await message.answer(f"Ты написал: {message.text}")
 
-    # Добавляем обработчики команд и сообщений
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
-    # Запускаем бота
-    print("Бот запущен на Amvera!")
-    app.run_polling()
+async def main():
+    print("Бот запущен и слушает...")
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
