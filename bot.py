@@ -1,16 +1,13 @@
-import os
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 
-# Настройка логов
-logging.basicConfig(level=logging.INFO)
+# ===== ТВОЙ ТОКЕН (уже вставлен) =====
+TOKEN = "8629438921:AAG3d3oeRgRaZtzTotRWr7srd4AlI5CMdsg"
+# ====================================
 
-# Получаем токен из переменной окружения Render
-TOKEN = os.environ.get("BOT_TOKEN")
-if not TOKEN:
-    raise ValueError("Токен не найден! Укажите BOT_TOKEN в переменных окружения.")
+logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -24,7 +21,7 @@ async def echo_handler(message: types.Message):
     await message.answer(f"Ты написал: {message.text}")
 
 async def main():
-    print("Бот запущен и слушает...")
+    print(">>> Бот запущен и слушает...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
