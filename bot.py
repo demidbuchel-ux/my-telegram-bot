@@ -2,15 +2,11 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
-
-# --- Импортируем наш «будильник» ---
 from keep_alive_ping import create_service
 
-# --- Настройки ---
 TOKEN = "8629438921:AAG3d3oeRgRaZtzTotRWr7srd4AlI5CMdsg"
 
-# --- Запускаем «будильник» ---
-# Эта строка запускает мини-сервер, который Render будет проверять.
+# Запускаем мини-сервер для пинга
 service = create_service()
 
 logging.basicConfig(level=logging.INFO)
