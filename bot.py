@@ -22,7 +22,7 @@ dp = Dispatcher()
 # ===== Обработчики команд Telegram =====
 @dp.message(CommandStart())
 async def start_handler(message: types.Message):
-    await message.answer("Максим лох")
+    await message.answer("ВАМ ОДОБРЕН КРЕДИТ")
 
 @dp.message()
 async def echo_handler(message: types.Message):
