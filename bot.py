@@ -10,7 +10,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from keep_alive_ping import create_service
 
 # --- Настройки ---
-TOKEN = "8629438921:AAG3d3oeRgRaZtzTotRWr7srd4AlI5CMdsg"
+TOKEN = "TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU""
 port = int(os.environ.get("PORT", 10000))
 service = create_service(port=port)
 
