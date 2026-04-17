@@ -39,7 +39,11 @@ gender_keyboard = ReplyKeyboardMarkup(
 @dp.message(CommandStart())
 async def start_handler(message: types.Message, state: FSMContext):
     await message.answer(
-        "Привет! Я бот Демида. Я умею раздевать людей 😏\n\n"
+        "👾 Тихо, спокойно, без свидетелей.
+Этот бот создан, чтобы снимать лишнее 😏
+
+🎭 Кто сегодня попадёт под раздачу?
+👩‍🦰 Она или 👨 Он?\n\n"
         "Выбери, кого будем раздевать:",
         reply_markup=gender_keyboard
     )
