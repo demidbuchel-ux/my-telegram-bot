@@ -45,7 +45,7 @@ async def run_web_server():
 async def main():
     # Запускаем веб-сервер
     await run_web_server()
-    # Запускаем поллинг бота
+    # Запускаем бота
     logging.info("Бот запущен и слушает Telegram...")
     await dp.start_polling(bot)
 
