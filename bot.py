@@ -12,8 +12,8 @@ from keep_alive_ping import create_service
 
 # ================= НАСТРОЙКИ =================
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
-# ЗАМЕНИ НА СВОЮ ССЫЛКУ ОТ NGROK (например, https://xxxx-xx-xx-xx-xx.ngrok.io)
-LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev/"
+# Твоя действующая ссылка на лабораторию Colab
+LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"
 # ============================================
 
 # Будильник для Render
@@ -73,7 +73,6 @@ async def process_gender(message: types.Message, state: FSMContext):
 # Обработка фото
 @dp.message(Form.waiting_for_photo, F.photo)
 async def handle_photo(message: types.Message, state: FSMContext):
-    # Сообщаем о начале
     wait_msg = await message.answer("🔄 Получил фото! Отправляю в лабораторию... Подожди немного.")
 
     # Получаем файл фото
@@ -87,11 +86,10 @@ async def handle_photo(message: types.Message, state: FSMContext):
             async with session.post(
                 f"{LAB_URL}/process",
                 json={"image_url": file_url, "gender": (await state.get_data()).get("gender")},
-                timeout=aiohttp.ClientTimeout(total=120)  # Ждём до 2 минут
+                timeout=aiohttp.ClientTimeout(total=120)
             ) as resp:
                 if resp.status == 200:
                     result = await resp.json()
-                    # Пока что просто выводим сообщение от лаборатории
                     await message.answer(f"✅ Лаборатория ответила: {result.get('message', 'OK')}")
                 else:
                     await message.answer(f"😕 Ошибка лаборатории: {resp.status}")
