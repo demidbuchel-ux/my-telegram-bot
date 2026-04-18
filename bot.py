@@ -13,7 +13,7 @@ from keep_alive_ping import create_service
 # ================= НАСТРОЙКИ =================
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
 # ЗАМЕНИ НА СВОЮ ССЫЛКУ ОТ NGROK (например, https://xxxx-xx-xx-xx-xx.ngrok.io)
-LAB_URL = "https://твоя-ссылка.ngrok.io"
+LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev/"
 # ============================================
 
 # Будильник для Render
