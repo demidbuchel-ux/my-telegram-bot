@@ -13,7 +13,7 @@ from keep_alive_ping import create_service
 
 # ================= НАСТРОЙКИ =================
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
-LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"
+LAB_URL = "https://ultimately-podcasts-hampton-piece.trycloudflare.com"
 # ============================================
 
 # Будильник для Render
