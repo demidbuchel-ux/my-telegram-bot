@@ -13,7 +13,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from keep_alive_ping import create_service
 
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
-LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"  # Убедись, что актуальный
+LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"  # <-- ОБНОВИ
 
 port = int(os.environ.get("PORT", 10000))
 service = create_service(port=port)
@@ -32,8 +32,7 @@ gender_keyboard = ReplyKeyboardMarkup(
         [KeyboardButton(text="👨 Мужчина")],
         [KeyboardButton(text="👩 Женщина")]
     ],
-    resize_keyboard=True,
-    input_field_placeholder="Выбери пол..."
+    resize_keyboard=True
 )
 
 cancel_keyboard = ReplyKeyboardMarkup(
@@ -43,29 +42,21 @@ cancel_keyboard = ReplyKeyboardMarkup(
 
 @dp.message(CommandStart())
 async def start_handler(message: types.Message, state: FSMContext):
-    await message.answer(
-        "Привет! Я бот Демида. 👋\n\nВыбери, кого будем раздевать:",
-        reply_markup=gender_keyboard
-    )
+    await message.answer("Привет! Выбери пол:", reply_markup=gender_keyboard)
     await state.set_state(Form.waiting_for_gender)
 
 @dp.message(Form.waiting_for_gender)
 async def process_gender(message: types.Message, state: FSMContext):
-    choice = message.text
-    if choice not in ["👨 Мужчина", "👩 Женщина"]:
-        await message.answer("Пожалуйста, выбери пол кнопкой 👇", reply_markup=gender_keyboard)
+    if message.text not in ["👨 Мужчина", "👩 Женщина"]:
+        await message.answer("Выбери кнопкой 👇", reply_markup=gender_keyboard)
         return
-
-    await state.update_data(gender=choice)
-    await message.answer(
-        f"Отлично! Ты выбрал {choice}. Теперь отправь мне фотографию.",
-        reply_markup=cancel_keyboard
-    )
+    await state.update_data(gender=message.text)
+    await message.answer("Отправь фото:", reply_markup=cancel_keyboard)
     await state.set_state(Form.waiting_for_photo)
 
 @dp.message(Form.waiting_for_photo, F.photo)
 async def handle_photo(message: types.Message, state: FSMContext):
-    wait_msg = await message.answer("🔄 Получил фото! Отправляю в лабораторию... Жди до 2 минут.")
+    wait_msg = await message.answer("🔄 Отправляю в лабораторию... Жди 1-2 минуты.")
 
     photo = message.photo[-1]
     file = await bot.get_file(photo.file_id)
@@ -78,46 +69,33 @@ async def handle_photo(message: types.Message, state: FSMContext):
                 json={"image_url": file_url, "gender": (await state.get_data()).get("gender")},
                 timeout=aiohttp.ClientTimeout(total=600)
             ) as resp:
-                response_text = await resp.text()
-                logging.info(f"Ответ лаборатории: статус {resp.status}, тело: {response_text[:200]}")
-
                 if resp.status == 200:
-                    try:
-                        result = json.loads(response_text)
-                        if result.get("status") == "success":
-                            img_bytes = base64.b64decode(result["image_base64"])
-                            # Правильный способ отправки фото из байтов
-                            photo_file = BufferedInputFile(img_bytes, filename="result.png")
-                            await message.answer_photo(photo_file, caption="✨ Готово! Наслаждайся.")
-                        else:
-                            await message.answer(f"😕 Ошибка лаборатории: {result.get('message')}")
-                    except Exception as e:
-                        await message.answer(f"😕 Ошибка при обработке ответа: {e}")
+                    result = await resp.json()
+                    if result.get("status") == "success":
+                        img_bytes = base64.b64decode(result["image_base64"])
+                        # Отправляем как файл (правильный способ для aiogram 3.x)
+                        await message.answer_photo(
+                            BufferedInputFile(img_bytes, filename="result.png"),
+                            caption="✨ Готово! Наслаждайся."
+                        )
+                    else:
+                        await message.answer(f"😕 Ошибка: {result.get('message')}")
                 else:
-                    await message.answer(f"😕 Ошибка лаборатории: {resp.status}\n{response_text[:200]}")
-    except asyncio.TimeoutError:
-        await message.answer("😕 Лаборатория думала слишком долго. Попробуй другое фото.")
-    except aiohttp.ClientConnectorError:
-        await message.answer("😕 Не удалось подключиться к лаборатории. Проверь, что Colab запущен и туннель активен.")
+                    await message.answer(f"😕 Ошибка лаборатории: {resp.status}")
     except Exception as e:
-        logging.error(f"Ошибка связи с лабораторией: {e}")
-        await message.answer(f"😕 Неизвестная ошибка: {e}")
+        logging.error(f"Ошибка: {e}")
+        await message.answer(f"😕 Ошибка связи: {e}")
 
     await wait_msg.delete()
-    await message.answer("Возвращаю в главное меню.", reply_markup=gender_keyboard)
+    await message.answer("Возвращаю в меню.", reply_markup=gender_keyboard)
     await state.clear()
 
 @dp.message(Form.waiting_for_photo, F.text == "❌ Отмена")
 async def cancel_handler(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer("Действие отменено.", reply_markup=gender_keyboard)
-
-@dp.message()
-async def echo_handler(message: types.Message):
-    await message.answer("Используй /start, чтобы начать.")
+    await message.answer("Отменено.", reply_markup=gender_keyboard)
 
 async def main():
-    print(f">>> Бот запущен на порту {port}...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
