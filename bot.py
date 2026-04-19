@@ -13,7 +13,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from keep_alive_ping import create_service
 
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
-LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"  # <-- Убедись, что адрес актуальный!
+LAB_URL = "https://ultimately-podcasts-hampton-piece.trycloudflare.com"  # Убедись, что адрес актуальный!
 
 port = int(os.environ.get("PORT", 10000))
 service = create_service(port=port)
@@ -78,6 +78,7 @@ async def handle_photo(message: types.Message, state: FSMContext):
                 json={"image_url": file_url, "gender": (await state.get_data()).get("gender")},
                 timeout=aiohttp.ClientTimeout(total=600)
             ) as resp:
+                # Читаем ответ как текст, чтобы увидеть возможные ошибки
                 response_text = await resp.text()
                 logging.info(f"Ответ лаборатории: статус {resp.status}, тело: {response_text}")
 
