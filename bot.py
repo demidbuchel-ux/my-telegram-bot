@@ -81,7 +81,7 @@ async def handle_photo(message: types.Message, state: FSMContext):
             async with session.post(
                 f"{LAB_URL}/process",
                 json={"image_url": file_url, "gender": (await state.get_data()).get("gender")},
-                timeout=aiohttp.ClientTimeout(total=300)  # Увеличил таймаут до 5 минут
+                timeout=aiohttp.ClientTimeout(total=1000)  # Увеличил таймаут до 5 минут
             ) as resp:
                 if resp.status == 200:
                     result = await resp.json()
