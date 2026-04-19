@@ -6,14 +6,14 @@ import base64
 import json
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, BufferedInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from keep_alive_ping import create_service
 
 TELEGRAM_TOKEN = "8787488197:AAF5pNAmOFwYItzwtVNZWcplXhgxQ1mnBEU"
-LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"  # Убедись, что адрес актуальный!
+LAB_URL = "https://reforest-eccentric-murky.ngrok-free.dev"  # замени на актуальный!
 
 port = int(os.environ.get("PORT", 10000))
 service = create_service(port=port)
@@ -78,16 +78,17 @@ async def handle_photo(message: types.Message, state: FSMContext):
                 json={"image_url": file_url, "gender": (await state.get_data()).get("gender")},
                 timeout=aiohttp.ClientTimeout(total=600)
             ) as resp:
-                # Читаем ответ как текст, чтобы увидеть возможные ошибки
                 response_text = await resp.text()
-                logging.info(f"Ответ лаборатории: статус {resp.status}, тело: {response_text}")
+                logging.info(f"Ответ лаборатории: статус {resp.status}, тело: {response_text[:200]}")
 
                 if resp.status == 200:
                     try:
                         result = json.loads(response_text)
                         if result.get("status") == "success":
                             img_data = base64.b64decode(result["image_base64"])
-                            await message.answer_photo(img_data, caption="✨ Готово! Наслаждайся.")
+                            # Исправление здесь: оборачиваем байты в BufferedInputFile
+                            photo_file = BufferedInputFile(img_data, filename="result.png")
+                            await message.answer_photo(photo_file, caption="✨ Готово! Наслаждайся.")
                         else:
                             await message.answer(f"😕 Ошибка лаборатории: {result.get('message')}")
                     except Exception as e:
